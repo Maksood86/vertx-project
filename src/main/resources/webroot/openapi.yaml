@@ -1,0 +1,211 @@
+---
+openapi: 3.0.0
+info:
+  title: Users API
+  description: An API for managing users
+  version: 1.0.0
+paths:
+  /login:
+    post:
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: login
+      summary: Authenticate User
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth'
+        required: true
+      responses:
+        200:
+          description: User Login success full
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+  /users:
+    get:
+      security:
+       - ApiKey: []
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: getAllUsers
+      summary: All users
+      operationId: listUsers
+      description: List all users
+      parameters:
+       - name: id
+         in: query
+         required: false
+         schema:
+          type: string
+         
+      responses:
+        200:
+          description: Returns the list of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      security:
+       - ApiKey: []
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: addUser
+      summary: Creates a user
+      operationId: addUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        200:
+          description: A user was created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+                
+  /users/{userId}: 
+    get:
+      security:
+       - ApiKey: []
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: getUserDetailById
+      summary: All users
+      operationId: getUserDetailById
+      description: List all users
+      parameters:
+       - name: userId
+         in: path
+         required: true
+         schema:
+          type: string
+         
+      responses:
+        200:
+          description: Returns user detail by user id
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/User'
+    delete:
+      security:
+       - ApiKey: []
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: deleteById
+      summary: Delete User by Id
+      operationId: deleteById
+      description: Delete User by Id
+      parameters:
+       - name: userId
+         in: path
+         required: true
+         schema:
+          type: string 
+      responses:
+        200:
+          description: Returns user detail by user id
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/User'
+                                
+    put:
+      security:
+       - ApiKey: []
+      x-vertx-event-bus:
+       address: user.service
+       timeout: 1000
+       method: updateUser
+      summary: update user detail
+      operationId: updateUser
+      description: update user detail
+      parameters:
+       - name: userId
+         in: path
+         required: true
+         schema:
+          type: string
+          
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'      
+      responses:
+        200:
+          description: update user detail by user id
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/User' 
+                            
+components:
+  schemas:
+    User:
+      required:
+      - firstName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string  
+        mobileNumber:
+          type: string 
+        age:
+          type: integer  
+    Employee:
+      required:
+      - firstName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string  
+        mobileNumber:
+          type: string 
+        age:
+          type: integer        
+    CommonResponse:
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+          
+    Auth:
+     required:
+      - username
+      - password
+     properties:
+        username:
+          type: string
+        password:
+          type: string 
+          
+  securitySchemes:
+   ApiKey:
+    type: apiKey
+    name: Authorization
+    in: header           
+          
+   
